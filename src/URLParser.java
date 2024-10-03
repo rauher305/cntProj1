@@ -1,67 +1,87 @@
 import java.io.*;
 import java.net.*;
+
 public class URLParser {
-    // using java.net.url class
-    // step by step is to read file containing URL's
-
-
-    // make a helper function that prints the protocol, host, port, and path
-    // function input is protocol, host, port, path
 
     public static void main(String[] args) {
-        try { // replace temp file with file name
-            BufferedReader reader = new BufferedReader(new FileReader("MUSTREPLACETOWORK"));
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("urls-file.txt"));
             String urlString;
-            // parse individual urls line by line
+
             while ((urlString = reader.readLine()) != null) {
-
-                URL url = new URL(urlString);
-                String protocol = url.getProtocol();
-                String host = url.getHost();
-                String path = url.getPath();
-                int port = url.getPort();
-                try {
-                    // parse url and set variables to different parts of the url
-                    
-
-                    // begin testing / checking
-                    if (port == -1) {
-                        // http = 80
-                        if ("http".equalsIgnoreCase(protocol)) {
-                            port = 80;
-                            // https = 443
-                        } else if ("https".equalsIgnoreCase(protocol)) {
-                            port = 443;
-                        }
-                    }
-                    // step 2 | tcp connection
-                    Socket socket = new Socket(host, port);
-                    System.out.println("Verified connection to " + host);
-
-                    // parse information
-                    System.out.println("Protocol: " + protocol);
-                    System.out.println("Host: " + host);
-                    System.out.println("Port: " + port);
-                    System.out.println("Path: " + path);
-                    socket.close();
-                    System.out.println("Connection closed");
-
-                } catch (MalformedURLException e) {
-                    // invalid the parsed information
-                    System.out.println("invalid url" + urlString);
-
-                    // step 3
-                } catch (IOException e) {
-                    // invalid socket catch
-                    System.out.println("URL: " + protocol + host);
-                    System.out.println("Status: Network Error");
-                }
+                fetchURL(urlString);
             }
-
 
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private static void fetchURL(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            String protocol = url.getProtocol();
+            String host = url.getHost();
+            String path = url.getPath();
+            int port = url.getPort();
+
+            // Set the default port
+            if (port == -1) {
+                port = "http".equalsIgnoreCase(protocol) ? 80 : 443;
+            }
+
+            // Create socket and establish TCP connection
+            try (Socket socket = new Socket(host, port);
+                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+                // Send an HTTP GET request
+                String request = "GET " + path + "\n" + "Host: " + host + "\n" + "Connection: closed";
+                out.println(request);
+                System.out.println("Request sent: " + request);
+
+                // Read the response status line
+                String responseLine = in.readLine();
+                System.out.println("URL: " + urlString);
+                System.out.println("Status: " + responseLine);
+
+                // Handle redirection if status code is 301 or 302
+                if (responseLine != null && (responseLine.contains("301") || responseLine.contains("302"))) {
+                    String location = "";
+                    String line;
+
+                    // Read headers to find the Location header
+                    while ((line = in.readLine()) != null && !line.isEmpty()) {
+                        if (line.startsWith("Location:")) {
+                            location = line.substring(10).trim(); // Extract the new URL
+                        }
+                    }
+
+                    // Print redirect information
+                    System.out.println("Redirected URL: " + location);
+
+                    // Follow the redirect if a new location is provided
+                    if (!location.isEmpty()) {
+                        // Create a new URL object for the redirected URL
+                        URL redirectUrl = new URL(location);
+                        // Print status for the redirected URL
+                        fetchURL(location);
+                    }
+                } else {
+                    // Handle other status codes
+                    System.out.println("Final response received for " + urlString + ": not a redirect.");
+                }
+
+            } catch (IOException e) {
+                System.out.println("Network error when connecting to " + host + ": " + e.getMessage());
+            }
+
+        } catch (MalformedURLException e) {
+            System.out.println("Invalid URL: " + urlString);
+        } catch (IOException e) {
+            System.out.println("Error reading URL: " + e.getMessage());
+        }
+    }
 }
+
