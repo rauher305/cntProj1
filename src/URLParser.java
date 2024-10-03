@@ -7,7 +7,7 @@ public class URLParser {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("urls-file.txt"));
             String urlString;
-
+            // call function on given url string line
             while ((urlString = reader.readLine()) != null) {
                 fetchURL(urlString);
             }
@@ -27,7 +27,8 @@ public class URLParser {
             int port = url.getPort();
 
             // Set the default port
-            if (port == -1) {
+            if (port == -1) { // if you are familiar with below, it is a ternary operator, value left = true, value right = False
+                // 80 for http, 443 for otherwise (https)
                 port = "http".equalsIgnoreCase(protocol) ? 80 : 443;
             }
 
@@ -46,7 +47,7 @@ public class URLParser {
                 System.out.println("URL: " + urlString);
                 System.out.println("Status: " + responseLine);
 
-                // Handle redirection if status code is 301 or 302
+                // redirection if not 301 or 302
                 if (responseLine != null && (responseLine.contains("301") || responseLine.contains("302"))) {
                     String location = "";
                     String line;
