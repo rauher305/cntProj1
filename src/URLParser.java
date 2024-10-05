@@ -5,7 +5,7 @@ public class URLParser {
 
     public static void main(String[] args) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("urls-file.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("src/urls-file.txt"));
             String urlString;
             // call function on given url string line
             while ((urlString = reader.readLine()) != null) {
