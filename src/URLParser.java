@@ -10,6 +10,7 @@ public class URLParser {
             // call function on given url string line
             while ((urlString = reader.readLine()) != null) {
                 fetchURL(urlString);
+                System.out.println();
             }
 
             reader.close();
@@ -41,7 +42,6 @@ public class URLParser {
                 String request = "GET " + path + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: closed\r\n\r\n";
 
                 out.println(request);
-                // System.out.println("Request sent: " + request); // comment this out eventually
 
                 // Read the response status line
                 String responseLine = in.readLine();
@@ -72,11 +72,14 @@ public class URLParser {
                     }
                 } else {
                     // Handle other status codes
+
                     System.out.println("Final response received for " + urlString + ": not a redirect.");
                 }
 
             } catch (IOException e) {
-                System.out.println("Network error when connecting to " + host + ": " + e.getMessage());
+                //System.out.println("Network error when connecting to " + host + ": " + e.getMessage());
+                System.out.println("URL: " + urlString);
+                System.out.println("Status: Network Error");
             }
 
         } catch (MalformedURLException e) {
