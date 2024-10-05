@@ -38,9 +38,10 @@ public class URLParser {
                  BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
                 // Send an HTTP GET request
-                String request = "GET " + path + "\n" + "Host: " + host + "\n" + "Connection: closed";
+                String request = "GET " + path + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: closed\r\n\r\n";
+
                 out.println(request);
-                System.out.println("Request sent: " + request);
+                // System.out.println("Request sent: " + request); // comment this out eventually
 
                 // Read the response status line
                 String responseLine = in.readLine();
