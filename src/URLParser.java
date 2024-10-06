@@ -5,6 +5,7 @@ public class URLParser {
 
     public static void main(String[] args) {
         try {
+            // we need to change the file to accept inline txt.file argument ie: "java monitor urls-file" in the terminal
             BufferedReader reader = new BufferedReader(new FileReader("src/urls-file.txt"));
             String urlString;
             // call function on given url string line
@@ -19,7 +20,7 @@ public class URLParser {
         }
     }
 
-    private static void fetchURL(String urlString) {
+    private static void fetchURL(String urlString, int flag) { // flag == 0 for default, 1 for redirect, 2 for reference
         try {
             URL url = new URL(urlString);
             String protocol = url.getProtocol();
@@ -45,23 +46,32 @@ public class URLParser {
 
                 // Read the response status line
                 String responseLine = in.readLine();
-                System.out.println("URL: " + urlString);
-                System.out.println("Status: " + responseLine);
+
+
+                //trying to figure out how to find referenced url
+
+
+
+
+                //System.out.println("URL: " + urlString);
+                System.out.print("URL: " + urlString);
+                System.out.println("\nStatus: " + responseLine.substring(9));
 
                 // redirection if not 301 or 302
-                if (responseLine != null && (responseLine.contains("301") || responseLine.contains("302"))) {
+                if ((responseLine != null) && (responseLine.contains("301") || responseLine.contains("302"))) {
                     String location = "";
                     String line;
 
                     // Read headers to find the Location header
                     while ((line = in.readLine()) != null && !line.isEmpty()) {
+
                         if (line.startsWith("Location:")) {
                             location = line.substring(10).trim(); // Extract the new URL
                         }
                     }
 
                     // Print redirect information
-                    System.out.println("Redirected URL: " + location);
+                    System.out.println("Redirected ");
 
                     // Follow the redirect if a new location is provided
                     if (!location.isEmpty()) {
@@ -70,11 +80,22 @@ public class URLParser {
                         // Print status for the redirected URL
                         fetchURL(location);
                     }
-                } else {
+                }else if (urlString.contains(".html")) {
+                    String imgTAG;
+                    String line;
+                    while ((line = in.readLine()) != null){
+                        if(line.startsWith("<img ")){
+                            System.out.println(line);
+                        }
+                    }
+                    //String imgURL = imgTAG.substring(10, imgTAG.indexOf(" "));
+
+
+                }/*else {
                     // Handle other status codes
 
                     System.out.println("Final response received for " + urlString + ": not a redirect.");
-                }
+                }*/
 
             } catch (IOException e) {
                 //System.out.println("Network error when connecting to " + host + ": " + e.getMessage());
