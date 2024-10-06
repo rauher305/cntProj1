@@ -10,7 +10,7 @@ public class URLParser {
             String urlString;
             // call function on given url string line
             while ((urlString = reader.readLine()) != null) {
-                fetchURL(urlString);
+                fetchURL(urlString,0);
                 System.out.println();
             }
 
@@ -54,7 +54,15 @@ public class URLParser {
 
 
                 //System.out.println("URL: " + urlString);
-                System.out.print("URL: " + urlString);
+                if(flag == 0)
+                    System.out.print("URL: " + urlString);
+                else if (flag == 1)
+                    System.out.print("Redirected URL: " + urlString);
+                else if (flag == 2)
+                    System.out.print("Referenced URL: " + urlString);
+
+
+
                 System.out.println("\nStatus: " + responseLine.substring(9));
 
                 // redirection if not 301 or 302
@@ -71,14 +79,13 @@ public class URLParser {
                     }
 
                     // Print redirect information
-                    System.out.println("Redirected ");
 
                     // Follow the redirect if a new location is provided
                     if (!location.isEmpty()) {
                         // Create a new URL object for the redirected URL
                         URL redirectUrl = new URL(location);
                         // Print status for the redirected URL
-                        fetchURL(location);
+                        fetchURL(location,1 );
                     }
                 }else if (urlString.contains(".html")) {
                     String imgTAG;
