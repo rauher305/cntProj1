@@ -92,10 +92,20 @@ public class URLParser {
                     String line;
                     while ((line = in.readLine()) != null){
                         if(line.startsWith("<img ")){
-                            System.out.println(line);
+                            line = line.substring(10);
+                            String[] parts = line.split("\\\"");
+                            line = parts[0];
+                            if(line.charAt(0) == 'h')
+                                fetchURL(line,2);
+                            else {
+                                int urlEndInt = urlString.lastIndexOf('/');
+                                String urlStart = urlString.substring(0,urlEndInt);
+                                String fullUrl = urlStart + line;
+                                fetchURL(fullUrl,2);
+                            }
+
                         }
                     }
-                    //String imgURL = imgTAG.substring(10, imgTAG.indexOf(" "));
 
 
                 }/*else {
