@@ -6,7 +6,7 @@ public class URLParser {
     public static void main(String[] args) {
         try {
             // we need to change the file to accept inline txt.file argument ie: "java monitor urls-file" in the terminal
-            BufferedReader reader = new BufferedReader(new FileReader("src/urls-file.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader(args[0]));
             String urlString;
             // call function on given url string line
             while ((urlString = reader.readLine()) != null) {
